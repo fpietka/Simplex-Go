@@ -224,7 +224,7 @@ func printMap(grid[hgrid][vgrid] float64, min float64, max float64) {
     //3.0 output to file
 	//3.1 Begin the file
 	//3.1.1 open output file
-    out, err := os.Create("test2.bmp")
+    out, err := os.Create("test.bmp")
     if err != nil {
         fmt.Printf("Target file opening error\n")
         panic(err)
