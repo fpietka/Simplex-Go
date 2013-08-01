@@ -32,7 +32,7 @@ func main() {
 	var min, max float64
 
 	//now that the blank map is set up, unblank it
-	fillMap(grid, min, max)
+	grid, min, max = fillMap(grid, min, max)
 
 	//now that we have an interesting map, create a .BMP file
 	printMap(grid, min, max)
@@ -55,7 +55,7 @@ func lerp(c1, c2 color, value float64) color {
 	return tcolor
 }
 
-func fillMap(grid[hgrid][vgrid] float64, min float64, max float64) {
+func fillMap(grid[hgrid][vgrid] float64, min float64, max float64) ([hgrid][vgrid] float64, float64, float64) {
 	//set up some variables
 	var i, j, k int
 	var octaves int = 16
@@ -198,6 +198,8 @@ func fillMap(grid[hgrid][vgrid] float64, min float64, max float64) {
             }
 		}
 	}
+
+    return grid, min, max
 }
 
 func printMap(grid[hgrid][vgrid] float64, min float64, max float64) {
