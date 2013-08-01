@@ -24,7 +24,7 @@ func main() {
     beginning := time.Now()
 
     //set the random seed
-	//srand((unsigned)beginning)
+	rand.Seed(beginning.UnixNano())
 
     //make the empty array
 	var grid[hgrid][vgrid] float64
