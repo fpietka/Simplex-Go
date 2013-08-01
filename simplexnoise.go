@@ -7,6 +7,7 @@ import (
     "math"
     "math/rand"
     "os"
+    "encoding/binary"
 )
 
 const (
@@ -310,6 +311,15 @@ func printMap(grid[hgrid][vgrid] float64, min float64, max float64) {
 
 	//3.3 end the file
 	out.Close()
+}
+
+func char(value int) ([]byte) {
+    buf := make([]byte, binary.MaxVarintLen64)
+    binary.PutUvarint(buf, uint64(value))
+
+    final := make([]byte, 1)
+    final[0] = buf[0]
+    return final
 }
 
 func random(max float64) float64 {
