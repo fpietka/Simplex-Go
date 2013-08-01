@@ -3,7 +3,6 @@ package main
 import (
     "fmt"
     "time"
-    "C"
     "math"
     "math/rand"
     "os"
@@ -17,7 +16,7 @@ const (
 
 type color struct {
 	//r=red, g=green, b=blue
-    v[3] C.uchar
+    v[3] int
 }
 
 
@@ -43,13 +42,13 @@ func main() {
 }
 
 func lerp(c1, c2 color, value float64) color {
-    var tcolor = color{[3]C.uchar{0, 0, 0}}
+    var tcolor = color{[3]int{0, 0, 0}}
 
 	for g := 0; g < 3; g++ {
 		if c1.v[g] > c2.v[g] {
-            tcolor.v[g] = c2.v[g] + C.uchar((float64(c1.v[g] - c2.v[g]) * value))
+            tcolor.v[g] = c2.v[g] + int((float64(c1.v[g] - c2.v[g]) * value))
         } else {
-            tcolor.v[g] = c1.v[g] + C.uchar((float64(c2.v[g] - c1.v[g]) * value))
+            tcolor.v[g] = c1.v[g] + int((float64(c2.v[g] - c1.v[g]) * value))
         }
 	}
 
@@ -215,12 +214,12 @@ func printMap(grid[hgrid][vgrid] float64, min float64, max float64) {
 	var i, j, k int
 
 	//these can be changed for interesting results
-	var landlow  = color{[3]C.uchar{0, 64, 0}}
-	var landhigh = color{[3]C.uchar{116, 182, 133}}
-	var waterlow = color{[3]C.uchar{55, 0, 0}}
-	var waterhigh = color{[3]C.uchar{106, 53, 0}}
-	var mountlow = color{[3]C.uchar{147, 157, 167}}
-	var mounthigh = color{[3]C.uchar{226, 223, 216}}
+	var landlow  = color{[3]int{0, 64, 0}}
+	var landhigh = color{[3]int{116, 182, 133}}
+	var waterlow = color{[3]int{55, 0, 0}}
+	var waterhigh = color{[3]int{106, 53, 0}}
+	var mountlow = color{[3]int{147, 157, 167}}
+	var mounthigh = color{[3]int{226, 223, 216}}
 
     //3.0 output to file
 	//3.1 Begin the file
@@ -233,58 +232,56 @@ func printMap(grid[hgrid][vgrid] float64, min float64, max float64) {
 
 	//3.1.2 copy the header
     //3.1.2.1 magic number
-    out.Write([]byte(string(C.char(66))))
-    out.Write([]byte(string(C.char(77))))
+    out.Write(char(66))
+    out.Write(char(77))
 
     //3.1.2.2 filsize/unused space
     for i = 0; i < 8; i++ {
-        out.Write([]byte(string(C.char(0))))
+        out.Write(char(0))
     }
 
     //3.1.2.3 data offset
-    out.Write([]byte(string(C.char(54))))
+    out.Write(char(54))
 
     //3.1.2.4 unused space
     for i = 0; i < 3; i++ {
-        out.Write([]byte(string(C.char(0))))
+        out.Write(char(0))
     }
 
     //3.1.2.5 header size
-    out.Write([]byte(string(C.char(40))))
+    out.Write(char(40))
 
     //3.1.2.6 unused space
     for i = 0; i < 3; i++ {
-        out.Write([]byte(string(C.char(0))))
+        out.Write(char(0))
     }
 
     //3.1.2.7 file width (trickier)
-    // C.uchar prevents overflows
-    out.Write([]byte(string(C.uchar(hgrid % 256))))
-    out.Write([]byte(string(C.char((hgrid >> 8) % 256))))
-    out.Write([]byte(string(C.char((hgrid >> 16) % 256))))
-    out.Write([]byte(string(C.char((hgrid >> 24) % 256))))
+    out.Write(char(hgrid % 256))
+    out.Write(char((hgrid >> 8) % 256))
+    out.Write(char((hgrid >> 16) % 256))
+    out.Write(char((hgrid >> 24) % 256))
 
     //3.1.2.8 file height (trickier)
-    // C.uchar prevents overflows
-    out.Write([]byte(string(C.uchar(vgrid % 256))))
-    out.Write([]byte(string(C.char((vgrid >> 8) % 256))))
-    out.Write([]byte(string(C.char((vgrid >> 16) % 256))))
-    out.Write([]byte(string(C.char((vgrid >> 24) % 256))))
+    out.Write(char(vgrid % 256))
+    out.Write(char((vgrid >> 8) % 256))
+    out.Write(char((vgrid >> 16) % 256))
+    out.Write(char((vgrid >> 24) % 256))
 
     //3.1.2.9 color planes
-    out.Write([]byte(string(C.char(1))))
-    out.Write([]byte(string(C.char(0))))
+    out.Write(char(1))
+    out.Write(char(0))
 
     //3.1.2.10 bit depth
-    out.Write([]byte(string(C.char(24))))
+    out.Write(char(24))
 
     //3.1.2.11 the rest
     for i = 0; i < 25; i++ {
-        out.Write([]byte(string(C.char(0))))
+        out.Write(char(0))
     }
 
 	//3.2 put in the elements of the array
-    var newcolor = color{[3]C.uchar{0, 0, 0}}
+    var newcolor = color{[3]int{0, 0, 0}}
 	for i = (vgrid - 1); i >= 0; i-- { //bitmaps start with the bottom row, and work their way up...
 		for j = 0; j < hgrid; j++ { //...but still go left to right
 			grid[j][i] -= min
@@ -299,13 +296,13 @@ func printMap(grid[hgrid][vgrid] float64, min float64, max float64) {
 				newcolor = lerp(landlow, landhigh, (grid[j][i] - flood) / (mount - flood))
             }
 
-			out.Write([]byte(string(C.char(newcolor.v[0])))) //blue
-			out.Write([]byte(string(C.char(newcolor.v[1])))) //green
-			out.Write([]byte(string(C.char(newcolor.v[2])))) //red
+			out.Write(char(newcolor.v[0])) //blue
+			out.Write(char(newcolor.v[1])) //green
+			out.Write(char(newcolor.v[2])) //red
 		}
 		//round off the row
 		for k = 0; k < (hgrid % 4); k++ {
-			out.Write([]byte(string(C.char(0))))
+			out.Write(char(0))
         }
 	}
 
